@@ -11,20 +11,26 @@ import java.util.Random;
  */
 public class Client {
 
+    private static String host;
+    private static int port;
+    private static int value;
+    private static volatile int stop;
+
     public static String numbers() {
-        String[] str = {"1", "2", "3"};
+        String[] str = {"Client-1", "Client-2", "Client-3"};
         int length = str.length;
         Random random = new Random();
         int number = random.nextInt(length);
         return str[number];
     }
 
-    public static void main(String[] args) {
+    public static void start() {
         try {
-            Socket socket = new Socket("localhost", 8888);
+            Socket socket = new Socket(host, 8888);
             OutputStream os = socket.getOutputStream();
             PrintWriter pw = new PrintWriter(os);
             pw.write(numbers());
+
             pw.flush();
             socket.shutdownOutput();
 
@@ -34,7 +40,7 @@ public class Client {
 
             String data;
             while ((data = br.readLine()) != null) {
-                System.out.println("com.tanjunchen.tcp.client.Client ===> " + data);
+                System.out.println("客户端：" + data);
             }
 
             is.close();
@@ -45,7 +51,36 @@ public class Client {
             os.close();
             socket.close();
         } catch (IOException e) {
+            stop = 1;
             e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        // 传递的值为 1 则一直调用(休眠 1 秒)
+        value = 0;
+        if (args.length > 0) {
+            value = Integer.parseInt(args[0]);
+        }
+
+        host = "localhost";
+        if (args.length > 1) {
+            host = args[1];
+        }
+
+        // 传递的值为 1,
+        port = 8888;
+        if (args.length > 2) {
+            port = Integer.parseInt(args[2]);
+        }
+
+        if (value == 1) {
+            while (stop == 0) {
+                start();
+                Thread.sleep(1000);
+            }
+        } else {
+            start();
         }
     }
 }
