@@ -26,7 +26,7 @@ public class Client {
 
     public static void start() {
         try {
-            Socket socket = new Socket(host, 8888);
+            Socket socket = new Socket(host, port);
             OutputStream os = socket.getOutputStream();
             PrintWriter pw = new PrintWriter(os);
             pw.write(numbers());
@@ -74,6 +74,7 @@ public class Client {
             port = Integer.parseInt(args[2]);
         }
 
+        System.out.println(host + " == " + port + " == " + value);
         if (value == 1) {
             while (stop == 0) {
                 start();
